@@ -23,6 +23,8 @@ namespace GoogleMobileAds.Android.Mediation.VerizonMedia
 {
     public class VerizonMediaClient : IVerizonMediaClient
     {
+        private const string VERIZON_PRIVACY_CLASS = "com.google.ads.mediation.verizon.VerizonPrivacy";
+
         private static VerizonMediaClient instance = new VerizonMediaClient();
         private VerizonMediaClient() { }
 
@@ -34,18 +36,18 @@ namespace GoogleMobileAds.Android.Mediation.VerizonMedia
             }
         }
 
-        public void SetConsentData(Dictionary<string, string> consentMap, bool restricted)
+        public void SetPrivacyData(Dictionary<string, string> privacyData)
         {
-            AndroidJavaObject consentHashMap = new AndroidJavaObject("java.util.HashMap");
-            AndroidJavaClass verizon = new AndroidJavaClass("com.google.ads.mediation.verizon.VerizonConsent");
+            AndroidJavaObject privacyHashMap = new AndroidJavaObject("java.util.HashMap");
+            AndroidJavaClass verizon = new AndroidJavaClass(VERIZON_PRIVACY_CLASS);
 
-            foreach (KeyValuePair<string, string> entry in consentMap)
+            foreach (KeyValuePair<string, string> entry in privacyData)
             {
-                consentHashMap.Call<AndroidJavaObject>("put", entry.Key, entry.Value);
+                privacyHashMap.Call<AndroidJavaObject>("put", entry.Key, entry.Value);
             }
 
-            AndroidJavaObject consentInstance = verizon.CallStatic<AndroidJavaObject>("getInstance");
-            consentInstance.Call("setConsentData", consentHashMap, restricted);
+            AndroidJavaObject privacyInstance = verizon.CallStatic<AndroidJavaObject>("getInstance");
+            privacyInstance.Call("setPrivacyData", privacyHashMap);
         }
 
         public string GetVerizonIABConsentKey()
